@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsUpdater", "BitsUpdater\BitsUpdater.csproj", "{722D747F-8C34-48B0-9301-F40A8B4CA2B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{722D747F-8C34-48B0-9301-F40A8B4CA2B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{722D747F-8C34-48B0-9301-F40A8B4CA2B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{722D747F-8C34-48B0-9301-F40A8B4CA2B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{722D747F-8C34-48B0-9301-F40A8B4CA2B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,33 @@
+﻿<Window x:Class="BitsUpdater.Packer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bits Update Packer" Height="350" Width="525">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Left">
+            <TextBlock Margin="2">Version: </TextBlock>
+            <TextBox Width="200" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1">
+            <TextBlock Margin="2">Update files:</TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Margin="2">Excluded files:</TextBlock>
+        </StackPanel>
+
+        <Button Grid.Row="3" 
+                HorizontalAlignment="Right"
+                Content="Create update"
+                FontWeight="Bold"
+                Width="120"/>
+    </Grid>
+</Window>

@@ -2,19 +2,20 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{722D747F-8C34-48B0-9301-F40A8B4CA2B8}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{63730B60-110F-447F-99EF-93784DA4E11A}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BitsUpdater</RootNamespace>
-    <AssemblyName>BitsUpdater</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>BitsUpdater.Example</RootNamespace>
+    <AssemblyName>BitsUpdater.Example</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +24,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,38 +34,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SharpBITS.Base, Version=1.3.0.0, Culture=neutral, PublicKeyToken=3f9d288a1b96f67a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpBITS.Base.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyProxy.cs" />
-    <Compile Include="FileSearchTemplate.cs" />
-    <Compile Include="Update.cs" />
-    <Compile Include="UpdateDownloadedEventArgs.cs" />
-    <Compile Include="UpdateErrorEventArgs.cs" />
-    <Compile Include="BitsUpdater.cs" />
-    <Compile Include="Extensions\AssemblyExtensions.cs" />
-    <Compile Include="Extensions\StreamExtensions.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UpdatePackage.cs" />
-    <Compile Include="UpdateStatus.cs" />
-    <Compile Include="XmlUpdateManifest.cs" />
-    <Compile Include="XmlUpdateStatus.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\Microsoft.SqlServer.ConnectionInfo.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.Smo.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.SmoExtended.dll" />
-    <Content Include="Libraries\SharpBITS.Base.dll" />
+    <ProjectReference Include="..\BitsUpdater\BitsUpdater.csproj">
+      <Project>{722D747F-8C34-48B0-9301-F40A8B4CA2B8}</Project>
+      <Name>BitsUpdater</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

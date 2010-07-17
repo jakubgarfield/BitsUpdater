@@ -55,7 +55,7 @@ namespace BitsUpdater
             using (FileStream certificate = new FileStream(_certificatePath, FileMode.Open))
             {
                 string fileName = string.Format(AssemblyName + AssemblySuffix, _version);
-                AssemblyName name = new AssemblyName(string.Format(AssemblyName, _version))
+                var name = new AssemblyName(string.Format(AssemblyName, _version))
                 {
                     Version = _version,
                     KeyPair = new StrongNameKeyPair(certificate),
@@ -79,7 +79,6 @@ namespace BitsUpdater
                 {
                     item.Dispose();
                 }
-
                 Compress(outputDirectory, fileName);
             }
         }
@@ -100,7 +99,7 @@ namespace BitsUpdater
 
         private IEnumerable<FileStream> CreatePackage(ModuleBuilder moduleBuilder, string outputDirectory)
         {
-            List<FileStream> files = new List<FileStream>();
+            var files = new List<FileStream>();
 
             foreach (var item in FilesForUpdate)
             {
@@ -121,7 +120,7 @@ namespace BitsUpdater
 
         private IEnumerable<FileStream> CreateDifferentialPackage(ModuleBuilder moduleBuilder, string outputDirectory)
         {
-            List<FileStream> files = new List<FileStream>();
+            var files = new List<FileStream>();
             string lastVersionDirectoryPath = Path.Combine(outputDirectory, LatestVersionDirectory);
 
             foreach (var item in FilesForUpdate)
@@ -147,7 +146,7 @@ namespace BitsUpdater
 
         private IEnumerable<FileStream> AddFiles(ModuleBuilder moduleBuilder, FileSearchTemplate template, bool compareLatest, string lastVersionDirectoryPath)
         {
-            List<FileStream> files = new List<FileStream>();
+            var files = new List<FileStream>();
             if (Directory.Exists(template.Directory))
             {
                 foreach (var filePath in Directory.GetFiles(template.Directory, template.Pattern, template.SearchOption))
@@ -157,8 +156,8 @@ namespace BitsUpdater
                         if (compareLatest)
                         {
                             string latestFilePath = Path.Combine(lastVersionDirectoryPath, Path.GetFileName(filePath));
-                            FileStream file = new FileStream(filePath, FileMode.Open);
-                            using (FileStream latestFile = new FileStream(latestFilePath, FileMode.Open))
+                            var file = new FileStream(filePath, FileMode.Open);
+                            using (var latestFile = new FileStream(latestFilePath, FileMode.Open))
                             {
                                 if (file.CompareTo(latestFile))
                                 {
@@ -173,7 +172,7 @@ namespace BitsUpdater
                         }
                         else
                         {
-                            FileStream file = new FileStream(filePath, FileMode.Open);
+                            var file = new FileStream(filePath, FileMode.Open);
                             moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
                             files.Add(file);
                         }
@@ -186,11 +185,11 @@ namespace BitsUpdater
 
         private void Compress(string directory, string fileName)
         {
-            using (FileStream inFile = new FileStream(Path.Combine(directory, fileName), FileMode.Open))
+            using (var inFile = new FileStream(Path.Combine(directory, fileName), FileMode.Open))
             {
-                using (FileStream outFile = new FileStream(Path.Combine(directory, fileName + PackageSuffix), FileMode.Create))
+                using (var outFile = new FileStream(Path.Combine(directory, fileName + PackageSuffix), FileMode.Create))
                 {
-                    using (GZipStream compress = new GZipStream(outFile, CompressionMode.Compress))
+                    using (var compress = new GZipStream(outFile, CompressionMode.Compress))
                     {
                         inFile.CopyTo(compress);
                     }

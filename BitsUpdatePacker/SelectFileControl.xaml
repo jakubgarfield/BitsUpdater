@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="BitsUpdatePacker.SelectFileControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:root="clr-namespace:BitsUpdatePacker"
+             xmlns:data="clr-namespace:BitsUpdatePacker.Data"
+             x:Name="selectFileControl"
+             Validation.ErrorTemplate="{x:Null}">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="60" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.Resources>
+            <data:ValidationBorderConverter x:Key="ValidationBorderConverter" />
+        </Grid.Resources>
+
+        <Grid.CommandBindings>
+            <CommandBinding Command="{x:Static root:UpdatePackerCommands.SelectFile}" 
+                            Executed="SelectFileExecuted" />
+        </Grid.CommandBindings>
+
+        <Border Height="24" BorderBrush="#ff0000" BorderThickness="{Binding ElementName=selectFileControl, Path=(Validation.Errors).CurrentItem, Converter={StaticResource ValidationBorderConverter}}">
+            <TextBox Grid.Column="0"
+                     ToolTip="{Binding ElementName=selectFileControl, Path=(Validation.Errors).CurrentItem.ErrorContent}"
+                     Text="{Binding ElementName=selectFileControl, Path=FilePath}"/>
+        </Border>
+        <Button Grid.Column="1"
+                Content="Browse"
+                Margin="10 0 0 0"
+                Command="{x:Static root:UpdatePackerCommands.SelectFile}"/>
+    </Grid>
+</UserControl>

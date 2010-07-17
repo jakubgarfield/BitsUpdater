@@ -51,7 +51,7 @@ namespace BitsUpdater
 
             try
             {
-                using (FileStream xmlFile = new FileStream(UpdateStatus.UpdateStatusFileName, FileMode.Open))
+                using (var xmlFile = new FileStream(UpdateStatus.UpdateStatusFileName, FileMode.Open))
                 {
                     updateStatus._updateStatus = (XmlUpdateStatus)_xmlUpdateStatusSerializer.Deserialize(xmlFile);
                 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsUpdater", "BitsUpdater\BitsUpdater.csproj", "{722D747F-8C34-48B0-9301-F40A8B4CA2B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsUpdater.Packer", "BitsUpdater.Packer\BitsUpdater.Packer.csproj", "{36B8E1B6-7B54-4864-9383-9F6B426A3C8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsUpdatePacker", "BitsUpdatePacker\BitsUpdatePacker.csproj", "{36B8E1B6-7B54-4864-9383-9F6B426A3C8F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitsUpdater.Example", "BitsUpdater.Example\BitsUpdater.Example.csproj", "{63730B60-110F-447F-99EF-93784DA4E11A}"
 EndProject

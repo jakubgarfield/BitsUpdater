@@ -1,0 +1,210 @@
+﻿<Window x:Class="BitsUpdatePacker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:root="clr-namespace:BitsUpdatePacker"   
+        xmlns:data="clr-namespace:BitsUpdatePacker.Data" 
+        Icon="Images\Main.png"
+        Title="Bits Update Packer" Height="700" Width="700">
+    <Grid Margin="10">
+
+        <Grid.CommandBindings>
+            <CommandBinding Command="{x:Static root:UpdatePackerCommands.CreatePackage}" 
+                                Executed="CreatePackageExecuted" />
+            <CommandBinding Command="{x:Static root:UpdatePackerCommands.AddNewTemplate}" 
+                                Executed="AddNewTemplateExecuted" />
+            <CommandBinding Command="{x:Static root:UpdatePackerCommands.RemoveTemplate}" 
+                                Executed="RemoveTemplateExecuted" />
+        </Grid.CommandBindings>
+
+        <Grid.Resources>
+
+            <data:VersionConverter x:Key="VersionConverter" />
+            <data:BoolToSearchOptionConverter x:Key="BoolToSearchOptionConverter" />
+
+            <DataTemplate x:Key="FileSearchTemplate">
+                <Grid Margin="5 0 5 10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="250" />
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="32" />
+                    </Grid.ColumnDefinitions>
+
+                    <root:SelectFolderControl Grid.Column="0">
+                        <root:SelectFolderControl.FolderPath>
+                            <Binding Path="Directory" UpdateSourceTrigger="PropertyChanged" Mode="TwoWay">
+                                <Binding.ValidationRules>
+                                    <data:DirectoryExistsValidationRule ErrorMessage="Directory path is not valid. Packer is skipping this file template." />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </root:SelectFolderControl.FolderPath>
+                    </root:SelectFolderControl>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <Label Target="{Binding ElementName=txtPattern}" 
+                               Content="Search Pattern: "/>
+                        <TextBox x:Name="txtPattern" 
+                                 Text="{Binding Pattern}"
+                                 Width="120"/>
+                    </StackPanel>
+
+                    <CheckBox Grid.Column="2"
+                              Content="Recursive"
+                              VerticalAlignment="Center"
+                              IsChecked="{Binding SearchOption, Converter={StaticResource BoolToSearchOptionConverter}}"/>
+
+                    <Button Grid.Column="3"
+                            Background="White"
+                            BorderBrush="White"
+                            Command="{x:Static root:UpdatePackerCommands.RemoveTemplate}"
+                            CommandParameter="{Binding}">
+                        <StackPanel>
+                            <Image Source="Images\Remove.png" 
+                                   HorizontalAlignment="Center"
+                                   Height="16" />
+                        </StackPanel>
+                    </Button>
+
+                </Grid>
+            </DataTemplate>
+
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140" />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        HorizontalAlignment="Left">
+                <TextBlock Margin="2">Version:</TextBlock>
+                <WrapPanel>
+                    <TextBox Width="200"
+                             ToolTip="{Binding ElementName=txtVersion, Path=(Validation.Errors).CurrentItem.ErrorContent}"
+                             x:Name="txtVersion">
+                        <Binding Path="NextVersion" Converter="{StaticResource VersionConverter}" UpdateSourceTrigger="Explicit">
+                            <Binding.ValidationRules>
+                                <data:RegexValidationRule Pattern="^(\d+\.)(\d+\.)?(\d+\.)?(\d+)$" 
+                                                          ErrorMessage="Version format (x.x.x.x) is incorrect." />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox>
+                    <CheckBox Content="Is update differential?"
+                              IsChecked="{Binding IsDifferential}"
+                              Margin="10 2 0 2"/>
+                </WrapPanel>
+
+                <TextBlock Margin="2">Certificate:</TextBlock>
+                <root:SelectFileControl x:Name="sfcCertificate"
+                                        ToolTip="{Binding ElementName=sfcCertificate, Path=(Validation.Errors).CurrentItem.ErrorContent}">
+                    <root:SelectFileControl.FilePath>
+                        <Binding Path="CertificatePath" UpdateSourceTrigger="Explicit" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <data:CertificateValidationRule ErrorMessage="File certificate path is invalid or the file is not valid certificate." />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </root:SelectFileControl.FilePath>
+                </root:SelectFileControl>
+
+                <TextBlock Margin="2">Output Directory:</TextBlock>
+                <root:SelectFolderControl x:Name="sfcOutput"
+                                      ToolTip="{Binding ElementName=sfcOutput, Path=(Validation.Errors).CurrentItem.ErrorContent}">
+                    <root:SelectFolderControl.FolderPath>
+                        <Binding Path="OutputDirectory" UpdateSourceTrigger="Explicit" Mode="TwoWay">
+                            <Binding.ValidationRules>
+                                <data:DirectoryCreateValidationRule ErrorMessage="Directory path is not valid or you don't have access rights." />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </root:SelectFolderControl.FolderPath>
+                </root:SelectFolderControl>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Margin="0 35 0 0">
+                <Button HorizontalAlignment="Center"   
+                        Height="50"
+                        Width="140"
+                        Command="{x:Static root:UpdatePackerCommands.CreatePackage}">
+                    <WrapPanel>
+                        <Image Source="Images\Pack.png" 
+                               Height="24"
+                               Margin="0 0 5 0"/>
+                        <Label Content="_Create package"
+                               VerticalAlignment="Center"
+                               FontWeight="Bold"/>
+                    </WrapPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="72" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock Margin="2"
+                           FontSize="15">Update folders and files:</TextBlock>
+                <Button Width="70" 
+                        HorizontalAlignment="Left"
+                        Margin="15 10 5 15"
+                        Command="{x:Static root:UpdatePackerCommands.AddNewTemplate}"
+                        CommandParameter="Include">
+                    <StackPanel Orientation="Horizontal" 
+                                Margin="1 0 5 0">
+                        <Image Source="Images\Add.png" 
+                               Height="12"
+                               Margin="0 0 5 0" />
+                        <TextBlock VerticalAlignment="Center">Add</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding FilesForUpdate}"
+                              ItemTemplate="{StaticResource FileSearchTemplate}"
+                              x:Name="itemsInclude"/>
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="72" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock Margin="2"
+                           FontSize="15">Excluded folders and files:</TextBlock>
+                <Button Width="70" 
+                        HorizontalAlignment="Left"
+                        Margin="15 10 5 15"
+                        Command="{x:Static root:UpdatePackerCommands.AddNewTemplate}"
+                        CommandParameter="Exclude">
+                    <StackPanel Orientation="Horizontal" 
+                                Margin="1 0 5 0">
+                        <Image Source="Images\Add.png" 
+                               Height="12"
+                               Margin="0 0 5 0" />
+                        <TextBlock VerticalAlignment="Center">Add</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding FilesNotForUpdate}"
+                              ItemTemplate="{StaticResource FileSearchTemplate}"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

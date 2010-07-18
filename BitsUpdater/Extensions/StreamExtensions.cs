@@ -25,41 +25,28 @@ namespace BitsUpdater.Extensions
             CopyTo(input, destination, bufferSize);
         }
 
-        public static bool CompareTo(this Stream input, Stream other)
+        public static bool AreEqual(this Stream input, Stream other)
         {
-            var bufferSize = 1048576;
-            return CompareTo(input, other, bufferSize);
-        }
+            int buffer = sizeof(Int64);
 
-        public static bool CompareTo(this Stream input, Stream other, int bufferSize)
-        {
-            var buffer1 = new byte[bufferSize];
-            var buffer2 = new byte[bufferSize];
+            if (input.Length != other.Length)
+                return false;
 
-            while (true)
+            int iterations = (int)Math.Ceiling((double)input.Length / buffer);
+
+            byte[] one = new byte[buffer];
+            byte[] two = new byte[buffer];
+
+            for (int i = 0; i < iterations; i++)
             {
-                int count1 = input.Read(buffer1, 0, bufferSize);
-                int count2 = other.Read(buffer2, 0, bufferSize);
+                input.Read(one, 0, buffer);
+                other.Read(two, 0, buffer);
 
-                if (count1 != count2)
-                {
+                if (BitConverter.ToInt64(one, 0) != BitConverter.ToInt64(two, 0))
                     return false;
-                }
-
-                if (count1 == 0)
-                {
-                    return true;
-                }
-
-                int iterations = (int)Math.Ceiling((double)count1 / sizeof(Int64));
-                for (int i = 0; i < iterations; i++)
-                {
-                    if (BitConverter.ToInt64(buffer1, i * sizeof(Int64)) != BitConverter.ToInt64(buffer2, i * sizeof(Int64)))
-                    {
-                        return false;
-                    }
-                }
             }
+
+            return true;
         }
     }
 }

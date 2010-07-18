@@ -10,6 +10,7 @@ namespace BitsUpdater.Example
         static void Main(string[] args)
         {
             BitsUpdater updater = new BitsUpdater();
+            Console.ReadLine();
         }
     }
 }

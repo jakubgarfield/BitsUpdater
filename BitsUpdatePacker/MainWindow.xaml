@@ -171,7 +171,7 @@
             
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding FilesForUpdate}"
+                <ItemsControl ItemsSource="{Binding IncludedFiles}"
                               ItemTemplate="{StaticResource FileSearchTemplate}"
                               x:Name="itemsInclude"/>
             </ScrollViewer>
@@ -202,7 +202,7 @@
 
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{Binding FilesNotForUpdate}"
+                <ItemsControl ItemsSource="{Binding ExcludedFiles}"
                               ItemTemplate="{StaticResource FileSearchTemplate}"/>
             </ScrollViewer>
         </Grid>

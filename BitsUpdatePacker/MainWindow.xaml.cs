@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 using BitsUpdater;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Configuration;
+using BitsUpdatePacker.Configuration;
 
 namespace BitsUpdatePacker
 {
@@ -30,6 +32,23 @@ namespace BitsUpdatePacker
 
         private void InitializeConfigValues()
         {
+            _package.OutputDirectory = ConfigurationManager.AppSettings["OutputDirectory"];
+            _package.CertificatePath = ConfigurationManager.AppSettings["CertificatePath"];
+            AddTemplates(_package.IncludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("includedFiles"));
+            AddTemplates(_package.ExcludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("excludedFiles"));
+        }
+
+        private void AddTemplates(ObservableCollection<UIFileSearchTemplate> observableCollection, TemplatesConfigSection configSection)
+        {
+            foreach (TemplatesElement item in configSection.Templates)
+            {
+                observableCollection.Add(new UIFileSearchTemplate
+                {
+                    Directory = item.Directory,
+                    Pattern = item.Pattern,
+                    SearchOption = item.SearchOption,
+                });
+            }
         }
 
         private void RemoveTemplateExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -45,11 +64,11 @@ namespace BitsUpdatePacker
         {
             if (e.Parameter.ToString() == "Include")
             {
-                _package.FilesForUpdate.Add(new UIFileSearchTemplate());                
+                _package.IncludedFiles.Add(new UIFileSearchTemplate());                
             }
             else if (e.Parameter.ToString() == "Exclude")
             {
-                _package.FilesNotForUpdate.Add(new UIFileSearchTemplate());
+                _package.ExcludedFiles.Add(new UIFileSearchTemplate());
             }
         }
 
@@ -59,10 +78,11 @@ namespace BitsUpdatePacker
             {
                 var package = new UpdatePackage(_package.CertificatePath, _package.NextVersion, _package.IsDifferential)
                 {
-                    FilesForUpdate = ConvertFileTemplates(_package.FilesForUpdate),
-                    FilesNotForUpdate = ConvertFileTemplates(_package.FilesNotForUpdate),
+                    IncludedFiles = ConvertFileTemplates(_package.IncludedFiles),
+                    ExcludedFiles = ConvertFileTemplates(_package.ExcludedFiles),
                 };
                 package.Create(_package.OutputDirectory);
+                MessageBox.Show("Update package was successfully completed.", "Package Completed!", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             }
         }
 

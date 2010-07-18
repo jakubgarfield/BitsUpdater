@@ -31,7 +31,7 @@ namespace BitsUpdater
         /// <summary>
         /// List of templates specifying files that are included in update.
         /// </summary>
-        public IEnumerable<FileSearchTemplate> FilesForUpdate
+        public IEnumerable<FileSearchTemplate> IncludedFiles
         {
             get;
             set;
@@ -40,7 +40,7 @@ namespace BitsUpdater
         /// <summary>
         /// List of templates for files that are NOT included in update.
         /// </summary>
-        public IEnumerable<FileSearchTemplate> FilesNotForUpdate
+        public IEnumerable<FileSearchTemplate> ExcludedFiles
         {
             get;
             set;
@@ -52,7 +52,7 @@ namespace BitsUpdater
         /// <param name="outputDirectory"></param>
         public void Create(string outputDirectory)
         {
-            using (FileStream certificate = new FileStream(_certificatePath, FileMode.Open))
+            using (FileStream certificate = new FileStream(_certificatePath, FileMode.Open, FileAccess.Read))
             {
                 string fileName = string.Format(AssemblyName + AssemblySuffix, _version);
                 var name = new AssemblyName(string.Format(AssemblyName, _version))
@@ -83,25 +83,11 @@ namespace BitsUpdater
             }
         }
 
-        internal static bool IsFileExcluded(string filePath, IEnumerable<FileSearchTemplate> excludedFileSearchTemplates)
-        {
-            foreach (var item in excludedFileSearchTemplates)
-            {
-                if ((!String.IsNullOrEmpty(item.Directory) && !filePath.Contains(item.Directory))
-                    || Regex.IsMatch(filePath, item.Pattern))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private IEnumerable<FileStream> CreatePackage(ModuleBuilder moduleBuilder, string outputDirectory)
         {
             var files = new List<FileStream>();
 
-            foreach (var item in FilesForUpdate)
+            foreach (var item in IncludedFiles)
             {
                 files.AddRange(AddFiles(moduleBuilder, item, false, null));
             }
@@ -113,6 +99,7 @@ namespace BitsUpdater
             }
 
             Directory.CreateDirectory(lastVersionDirectoryPath);
+
             FillLatestVersionDirectory(files, lastVersionDirectoryPath);
 
             return files;
@@ -123,7 +110,7 @@ namespace BitsUpdater
             var files = new List<FileStream>();
             string lastVersionDirectoryPath = Path.Combine(outputDirectory, LatestVersionDirectory);
 
-            foreach (var item in FilesForUpdate)
+            foreach (var item in IncludedFiles)
             {
                 files.AddRange(AddFiles(moduleBuilder, item, true, lastVersionDirectoryPath));
             }
@@ -147,32 +134,41 @@ namespace BitsUpdater
         private IEnumerable<FileStream> AddFiles(ModuleBuilder moduleBuilder, FileSearchTemplate template, bool compareLatest, string lastVersionDirectoryPath)
         {
             var files = new List<FileStream>();
+            var excludedFileNames = GetExcludedFileNames(ExcludedFiles);
             if (Directory.Exists(template.Directory))
             {
                 foreach (var filePath in Directory.GetFiles(template.Directory, template.Pattern, template.SearchOption))
                 {
-                    if (!IsFileExcluded(filePath, FilesNotForUpdate))
+                    if (!excludedFileNames.Contains(filePath))
                     {
                         if (compareLatest)
                         {
                             string latestFilePath = Path.Combine(lastVersionDirectoryPath, Path.GetFileName(filePath));
-                            var file = new FileStream(filePath, FileMode.Open);
-                            using (var latestFile = new FileStream(latestFilePath, FileMode.Open))
+                            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                            if (File.Exists(latestFilePath))
                             {
-                                if (file.CompareTo(latestFile))
+                                using (var latestFile = new FileStream(latestFilePath, FileMode.Open, FileAccess.Read))
                                 {
-                                    moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
-                                    files.Add(file);
+                                    if (!file.AreEqual(latestFile))
+                                    {
+                                        moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
+                                        files.Add(file);
+                                    }
+                                    else
+                                    {
+                                        file.Close();
+                                    }
                                 }
-                                else
-                                {
-                                    file.Close();
-                                }
+                            }
+                            else
+                            {
+                                moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
+                                files.Add(file);
                             }
                         }
                         else
                         {
-                            var file = new FileStream(filePath, FileMode.Open);
+                            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                             moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
                             files.Add(file);
                         }
@@ -183,9 +179,24 @@ namespace BitsUpdater
             return files;
         }
 
+        private IEnumerable<String> GetExcludedFileNames(IEnumerable<FileSearchTemplate> filesNotForUpdate)
+        {
+            var result = new List<String>();
+
+            foreach (var item in filesNotForUpdate)
+            {
+                if (Directory.Exists(item.Directory))
+                {
+                    result.AddRange(Directory.GetFiles(item.Directory, item.Pattern, item.SearchOption));
+                }
+            }
+
+            return result;
+        }
+
         private void Compress(string directory, string fileName)
         {
-            using (var inFile = new FileStream(Path.Combine(directory, fileName), FileMode.Open))
+            using (var inFile = new FileStream(Path.Combine(directory, fileName), FileMode.Open, FileAccess.Read))
             {
                 using (var outFile = new FileStream(Path.Combine(directory, fileName + PackageSuffix), FileMode.Create))
                 {

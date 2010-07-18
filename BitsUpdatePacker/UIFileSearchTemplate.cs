@@ -6,7 +6,7 @@ using System.IO;
 
 namespace BitsUpdatePacker
 {
-    public class UIFileSearchTemplate
+    internal sealed class UIFileSearchTemplate
     {
         public string Directory
         {

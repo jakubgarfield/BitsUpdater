@@ -18,7 +18,7 @@ namespace BitsUpdatePacker.Data
 
             if (!string.IsNullOrEmpty(_pattern))
             {
-                var regex = new Regex(_pattern);
+                var regex = new Regex(_pattern);                
 
                 if (!regex.IsMatch((value ?? String.Empty).ToString()))
                 {

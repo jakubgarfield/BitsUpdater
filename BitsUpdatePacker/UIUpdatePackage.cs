@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace BitsUpdatePacker
 {
-    public sealed class UIUpdatePackage
+    internal sealed class UIUpdatePackage
     {
         public Version NextVersion
         {
@@ -32,13 +32,13 @@ namespace BitsUpdatePacker
             set;
         }
 
-        public ObservableCollection<UIFileSearchTemplate> FilesForUpdate
+        public ObservableCollection<UIFileSearchTemplate> IncludedFiles
         {
             get;
             private set;
         }
 
-        public ObservableCollection<UIFileSearchTemplate> FilesNotForUpdate
+        public ObservableCollection<UIFileSearchTemplate> ExcludedFiles
         {
             get;
             private set;
@@ -46,8 +46,8 @@ namespace BitsUpdatePacker
 
         public UIUpdatePackage()
         {
-            FilesForUpdate = new ObservableCollection<UIFileSearchTemplate>();
-            FilesNotForUpdate = new ObservableCollection<UIFileSearchTemplate>();
+            IncludedFiles = new ObservableCollection<UIFileSearchTemplate>();
+            ExcludedFiles = new ObservableCollection<UIFileSearchTemplate>();
         }
     }
 }

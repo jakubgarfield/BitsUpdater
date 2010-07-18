@@ -41,6 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -59,6 +60,9 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Configuration\TemplatesCollection.cs" />
+    <Compile Include="Configuration\TemplatesElement.cs" />
+    <Compile Include="Configuration\TemplatesConfigSection.cs" />
     <Compile Include="Data\BoolToSearchOptionConverter.cs" />
     <Compile Include="Data\CertificateValidationRule.cs" />
     <Compile Include="Data\DirectoryCreateValidationRule.cs" />
@@ -115,6 +119,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="App.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

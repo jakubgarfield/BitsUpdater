@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace BitsUpdatePacker
 {
-    internal sealed class UIUpdatePackage
+    internal sealed class UIUpdatePackage : DependencyObject
     {
+        public static readonly DependencyProperty TokenStringProperty = DependencyProperty.Register("TokenString", typeof(string), typeof(UIUpdatePackage));
+        public string TokenString
+        {
+            get { return (string)GetValue(TokenStringProperty); }
+            set { SetValue(TokenStringProperty, value); }
+        }
+
         public Version NextVersion
         {
             get;

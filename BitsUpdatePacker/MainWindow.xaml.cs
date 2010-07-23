@@ -81,7 +81,7 @@ namespace BitsUpdatePacker
                     IncludedFiles = ConvertFileTemplates(_package.IncludedFiles),
                     ExcludedFiles = ConvertFileTemplates(_package.ExcludedFiles),
                 };
-                package.Create(_package.OutputDirectory);
+                _package.TokenString = package.Create(_package.OutputDirectory);
                 MessageBox.Show("Update package was successfully completed.", "Package Completed!", MessageBoxButton.OK, MessageBoxImage.Asterisk);
             }
         }

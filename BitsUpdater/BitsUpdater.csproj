@@ -45,8 +45,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyProxy.cs" />
+    <Compile Include="Behavior\IUpdateBehavior.cs" />
+    <Compile Include="Behavior\UpdateProcessBehavior.cs" />
+    <Compile Include="Behavior\UpdateProcessWithDatabaseBehavior.cs" />
+    <Compile Include="Behavior\UpdateServiceBehavior.cs" />
     <Compile Include="FileSearchTemplate.cs" />
     <Compile Include="Update.cs" />
+    <Compile Include="UpdateCheckedEventArgs.cs" />
     <Compile Include="UpdateDownloadedEventArgs.cs" />
     <Compile Include="UpdateErrorEventArgs.cs" />
     <Compile Include="BitsUpdater.cs" />

@@ -12,6 +12,6 @@ namespace BitsUpdater
         [XmlElementAttribute("NextVersion")]
         public String NextVersion;
         [XmlElementAttribute("CurrentBITS")]
-        public String BitsJob;
+        public String BitsJobId;
     }
 }

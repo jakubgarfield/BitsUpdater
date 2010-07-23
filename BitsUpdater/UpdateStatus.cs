@@ -37,7 +37,7 @@ namespace BitsUpdater
             set
             {
                 _jobId = value;
-                _updateStatus.BitsJob = _jobId.ToString();
+                _updateStatus.BitsJobId = _jobId.ToString();
             }
         }
 
@@ -63,7 +63,7 @@ namespace BitsUpdater
 
             try
             {
-                updateStatus._jobId = new Guid(updateStatus._updateStatus.BitsJob);
+                updateStatus._jobId = new Guid(updateStatus._updateStatus.BitsJobId);
                 updateStatus._nextVersion = new Version(updateStatus._updateStatus.NextVersion);
             }
             catch (FormatException)

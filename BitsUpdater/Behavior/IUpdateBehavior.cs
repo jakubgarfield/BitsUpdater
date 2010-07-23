@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BitsUpdater
+namespace BitsUpdater.Behavior
 {
-    public sealed class UpdateDownloadedEventArgs : EventArgs
+    public interface IUpdateBehavior
     {
+        void Execute();
     }
 }

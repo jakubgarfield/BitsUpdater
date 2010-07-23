@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 
 namespace BitsUpdater
 {
+    /// <summary>
+    /// Class for creating and unpacking normalised BitsUpdater update packages that are used in whole update process.
+    /// </summary>
     public sealed class UpdatePackage
     {
         private readonly string _certificatePath;
@@ -47,10 +50,11 @@ namespace BitsUpdater
         }
 
         /// <summary>
-        /// Creates normalized Update Package for BitsUpdater library
+        /// Creates normalized Update Package for BitsUpdater library.
         /// </summary>
-        /// <param name="outputDirectory"></param>
-        public void Create(string outputDirectory)
+        /// <param name="outputDirectory">Directory where to save files. It is recommended to use one directory because of program looking for Last Version files during differential update.</param>
+        /// <returns>Assembly Thumbprint as string for retrieving assembly content during unpacking phase.</returns>
+        public string Create(string outputDirectory)
         {
             using (FileStream certificate = new FileStream(_certificatePath, FileMode.Open, FileAccess.Read))
             {
@@ -79,8 +83,21 @@ namespace BitsUpdater
                 {
                     item.Dispose();
                 }
+
                 Compress(outputDirectory, fileName);
+                return RetrievePublicTokenString(name);
             }
+        }
+
+        private string RetrievePublicTokenString(AssemblyName name)
+        {
+            var builder = new StringBuilder();
+            var token = name.GetPublicKeyToken();
+            for (int i = 0; i < token.GetLength(0); i++)
+            {
+                builder.Append(token[i].ToString("x"));
+            }
+            return builder.ToString();
         }
 
         private IEnumerable<FileStream> CreatePackage(ModuleBuilder moduleBuilder, string outputDirectory)
@@ -141,18 +158,17 @@ namespace BitsUpdater
                 {
                     if (!excludedFileNames.Contains(filePath))
                     {
+                        var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                         if (compareLatest)
                         {
                             string latestFilePath = Path.Combine(lastVersionDirectoryPath, Path.GetFileName(filePath));
-                            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                             if (File.Exists(latestFilePath))
                             {
                                 using (var latestFile = new FileStream(latestFilePath, FileMode.Open, FileAccess.Read))
                                 {
                                     if (!file.AreEqual(latestFile))
                                     {
-                                        moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
-                                        files.Add(file);
+                                        AddFile(moduleBuilder, filePath, file, files);
                                     }
                                     else
                                     {
@@ -162,21 +178,24 @@ namespace BitsUpdater
                             }
                             else
                             {
-                                moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
-                                files.Add(file);
+                                AddFile(moduleBuilder, filePath, file, files);
                             }
                         }
                         else
                         {
-                            var file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                            moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
-                            files.Add(file);
+                            AddFile(moduleBuilder, filePath, file, files);
                         }
                     }
                 }
             }
 
             return files;
+        }
+
+        private void AddFile(ModuleBuilder moduleBuilder, string filePath, FileStream file, List<FileStream> files)
+        {
+            moduleBuilder.DefineManifestResource(Path.GetFileName(filePath), file, ResourceAttributes.Public);
+            files.Add(file);
         }
 
         private IEnumerable<String> GetExcludedFileNames(IEnumerable<FileSearchTemplate> filesNotForUpdate)

@@ -9,7 +9,9 @@ namespace BitsUpdater.Example
     {
         static void Main(string[] args)
         {
-            BitsUpdater updater = new BitsUpdater();
+            BitsUpdater updater = new BitsUpdater("http://chodounsky.net/files/temp/UpdateManifest.xml");
+            updater.Download();
+            
             Console.ReadLine();
         }
     }

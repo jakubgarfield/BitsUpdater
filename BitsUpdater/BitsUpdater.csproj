@@ -46,11 +46,9 @@
   <ItemGroup>
     <Compile Include="AssemblyProxy.cs" />
     <Compile Include="Behavior\IUpdateBehavior.cs" />
-    <Compile Include="Behavior\UpdateProcessBehavior.cs" />
     <Compile Include="Behavior\UpdateProcessWithDatabaseBehavior.cs" />
     <Compile Include="Behavior\UpdateServiceBehavior.cs" />
     <Compile Include="FileSearchTemplate.cs" />
-    <Compile Include="Update.cs" />
     <Compile Include="UpdateCheckedEventArgs.cs" />
     <Compile Include="UpdateDownloadedEventArgs.cs" />
     <Compile Include="UpdateErrorEventArgs.cs" />
@@ -59,15 +57,12 @@
     <Compile Include="Extensions\StreamExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UpdatePackage.cs" />
+    <Compile Include="UpdateProgressEventArgs.cs" />
     <Compile Include="UpdateStatus.cs" />
     <Compile Include="XmlUpdateManifest.cs" />
     <Compile Include="XmlUpdateStatus.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\Microsoft.SqlServer.ConnectionInfo.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.Smo.dll" />
-    <Content Include="Libraries\Microsoft.SqlServer.SmoExtended.dll" />
     <Content Include="Libraries\SharpBITS.Base.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

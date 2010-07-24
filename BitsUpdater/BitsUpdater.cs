@@ -15,7 +15,10 @@ namespace BitsUpdater
     public sealed class BitsUpdater : IDisposable
     {
         private static readonly XmlSerializer _manifestSerializer = new XmlSerializer(typeof(XmlUpdateManifest));
+
         private const String JobDescription = "BitsUpdater application update download";
+        private const String UpdateDirectory = "Versions\\{0}";
+
         private readonly UpdateStatus _status = UpdateStatus.Load();
         private readonly BitsManager _manager = new BitsManager();
         private readonly WebClient _webClient = new WebClient();
@@ -82,7 +85,7 @@ namespace BitsUpdater
             {
                 if (!IsUpdateDownloaded())
                 {
-                    if (_manager.Jobs.ContainsKey(_status.BitsJobId))
+                    if (_manager.EnumJobs().ContainsKey(_status.BitsJobId))
                     {
                         var job = _manager.Jobs[_status.BitsJobId];
                         RegisterEvents(job);
@@ -98,10 +101,26 @@ namespace BitsUpdater
             }
         }
 
-        public void Update(IUpdateBehavior behavior)
+        public bool Update(string publicToken)
         {
-            //TODO unpack
-            behavior.Execute();
+            return Update(null, publicToken);
+        }
+
+        public bool Update(IUpdateBehavior behavior, string publicToken)
+        {
+            if (_status.NextVersion > Assembly.GetExecutingAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
+            {
+                UpdatePackage.Extract(string.Format(UpdateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
+
+                if (behavior != null)
+                {
+                    behavior.Execute();
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public void Dispose()
@@ -146,9 +165,9 @@ namespace BitsUpdater
 
             job.OnJobTransferred += (s, e) =>
                 {
-                    OnUpdateDownloaded(new UpdateDownloadedEventArgs());
                     job.Complete();
                     job.Dispose();
+                    OnUpdateDownloaded(new UpdateDownloadedEventArgs());
                 };
 
             job.OnJobModified += (s, e) =>
@@ -165,7 +184,7 @@ namespace BitsUpdater
 
         private String GetUpdateSaveLocation()
         {
-            return Path.Combine(Assembly.GetExecutingAssembly().GetDirectory(), String.Format("{0}{1}{2}", string.Format(UpdatePackage.AssemblyName, _manifest.Version), UpdatePackage.AssemblySuffix, UpdatePackage.PackageSuffix));
+            return Path.Combine(Assembly.GetExecutingAssembly().GetDirectory(), String.Format("{0}{1}{2}", string.Format(UpdatePackage.AssemblyName, _status.NextVersion), UpdatePackage.AssemblySuffix, UpdatePackage.PackageSuffix));
         }
 
         private bool UpdatesAvailable()

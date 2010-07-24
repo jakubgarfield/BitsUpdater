@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.IO.Compression;
 using BitsUpdater.Extensions;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace BitsUpdater
 {
@@ -20,9 +21,9 @@ namespace BitsUpdater
         private readonly Version _version;
         private readonly bool _isDifferential;
         internal const string LatestVersionDirectory = "LatestVersion\\";
-        internal const string AssemblyName = "Update.{0}";
-        internal const string AssemblySuffix = ".dll";
-        internal const string PackageSuffix = ".gz";
+        public const string AssemblyName = "Update.{0}";
+        public const string AssemblySuffix = ".dll";
+        public const string PackageSuffix = ".gz";
 
         public UpdatePackage(string certificatePath, Version version, bool isDifferential)
         {
@@ -56,7 +57,7 @@ namespace BitsUpdater
         /// <returns>Assembly Thumbprint as string for retrieving assembly content during unpacking phase.</returns>
         public string Create(string outputDirectory)
         {
-            using (FileStream certificate = new FileStream(_certificatePath, FileMode.Open, FileAccess.Read))
+            using (var certificate = new FileStream(_certificatePath, FileMode.Open, FileAccess.Read))
             {
                 string fileName = string.Format(AssemblyName + AssemblySuffix, _version);
                 var name = new AssemblyName(string.Format(AssemblyName, _version))
@@ -64,8 +65,8 @@ namespace BitsUpdater
                     Version = _version,
                     KeyPair = new StrongNameKeyPair(certificate),
                 };
-                AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Save, outputDirectory);
-                ModuleBuilder moduleBuilder = builder.DefineDynamicModule(name.Name, fileName);
+                var builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Save, outputDirectory);
+                var moduleBuilder = builder.DefineDynamicModule(name.Name, fileName);
 
                 IEnumerable<FileStream> files;
                 if (_isDifferential && Directory.Exists(Path.Combine(outputDirectory, LatestVersionDirectory)))
@@ -87,6 +88,67 @@ namespace BitsUpdater
                 Compress(outputDirectory, fileName);
                 return RetrievePublicTokenString(name);
             }
+        }
+
+        public static void Extract(string outputDirectory, Version version, string publicToken)
+        {
+            CopyPreviousFiles(outputDirectory);
+            Decompress(string.Format(AssemblyName, version) + AssemblySuffix);
+            ExtractFiles(version, outputDirectory, publicToken);
+        }
+
+        private static void CopyPreviousFiles(string outputDirectory)
+        {
+            if (Directory.Exists(outputDirectory))
+            {
+                Directory.Delete(outputDirectory, true);
+            }
+
+            string versionDirectory = Path.GetDirectoryName(outputDirectory);
+            Version max = new Version();
+            foreach (var item in Directory.GetDirectories(versionDirectory))
+            {
+                try
+                {
+                    var current = new Version(Path.GetFileName(item));
+                    if (current > max)
+                    {
+                        max = current;
+                    }
+                }
+                catch (ArgumentException) { /* Version try parse */ }
+                catch (OverflowException) { /* Version try parse */ }
+                catch (FormatException) { /* Version try parse */ }
+
+            }
+
+            Directory.CreateDirectory(outputDirectory);
+
+            if (max > new Version())
+            {
+                foreach (var item in Directory.GetFiles(Path.Combine(versionDirectory, max.ToString())))
+                {
+                    using (FileStream input = new FileStream(item, FileMode.Open, FileAccess.Read))
+                    {
+                        using (FileStream output = new FileStream(Path.Combine(outputDirectory, Path.GetFileName(item)), FileMode.OpenOrCreate))
+                        {
+                            input.CopyTo(output);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void ExtractFiles(Version version, string outputDirectory, string publicToken)
+        {
+            var domain = AppDomain.CreateDomain("TemporaryDomain");
+            var proxy = domain.CreateInstanceAndUnwrap(Assembly.GetAssembly(typeof(AssemblyProxy)).FullName, typeof(AssemblyProxy).ToString()) as AssemblyProxy;
+            if (proxy != null)
+            {
+                proxy.ExtractUpdate(version, outputDirectory, publicToken);
+            }
+            AppDomain.Unload(domain);
+            File.Delete(string.Format(AssemblyName, version) + AssemblySuffix);
         }
 
         private string RetrievePublicTokenString(AssemblyName name)
@@ -225,7 +287,22 @@ namespace BitsUpdater
                     }
                 }
             }
-            File.Delete(directory + fileName);
+            File.Delete(Path.Combine(directory, fileName));
+        }
+
+        private static void Decompress(string fileName)
+        {
+            using (var inFile = new FileStream(fileName + PackageSuffix, FileMode.Open))
+            {
+                using (var outFile = new FileStream(fileName, FileMode.Create))
+                {
+                    using (var decompress = new GZipStream(inFile, CompressionMode.Decompress))
+                    {
+                        decompress.CopyTo(outFile);
+                    }
+                }
+            }
+            File.Delete(fileName + PackageSuffix);
         }
     }
 }

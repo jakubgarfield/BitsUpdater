@@ -16,6 +16,12 @@ namespace BitsUpdatePacker
             set { SetValue(TokenStringProperty, value); }
         }
 
+        public string PackageUrlDirectory
+        {
+            get;
+            set;
+        }
+
         public Version NextVersion
         {
             get;

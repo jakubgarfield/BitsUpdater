@@ -73,7 +73,7 @@
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="140" />
+            <RowDefinition Height="185" />
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -84,7 +84,8 @@
                 <ColumnDefinition Width="250" />
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0"
-                        HorizontalAlignment="Left">
+                        HorizontalAlignment="Left"
+                        Margin="0 0 10 0">
                 <TextBlock Margin="2">Version:</TextBlock>
                 <WrapPanel>
                     <TextBox Width="200"
@@ -101,6 +102,18 @@
                               IsChecked="{Binding IsDifferential}"
                               Margin="10 2 0 2"/>
                 </WrapPanel>
+                
+                <TextBlock Margin="2">Url Directory (not the file Url!):</TextBlock>
+                <TextBox Width="280"
+                         ToolTip="{Binding ElementName=txtUrl, Path=(Validation.Errors).CurrentItem.ErrorContent}"
+                         HorizontalAlignment="Left"
+                         x:Name="txtUrl">
+                    <Binding Path="PackageUrlDirectory" UpdateSourceTrigger="Explicit">
+                        <Binding.ValidationRules>
+                            <data:StringRequiredValidationRule ErrorMessage="Update url should have value." />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
 
                 <TextBlock Margin="2">Certificate:</TextBlock>
                 <root:SelectFileControl x:Name="sfcCertificate"

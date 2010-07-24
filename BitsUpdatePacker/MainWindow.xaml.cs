@@ -16,12 +16,14 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Configuration;
 using BitsUpdatePacker.Configuration;
+using System.Xml.Serialization;
 
 namespace BitsUpdatePacker
 {
     public partial class MainWindow : Window
     {
         private UIUpdatePackage _package = new UIUpdatePackage();
+        private static readonly XmlSerializer _manifestSerializer = new XmlSerializer(typeof(XmlUpdateManifest));
 
         public MainWindow()
         {
@@ -34,6 +36,7 @@ namespace BitsUpdatePacker
         {
             _package.OutputDirectory = ConfigurationManager.AppSettings["OutputDirectory"];
             _package.CertificatePath = ConfigurationManager.AppSettings["CertificatePath"];
+            _package.PackageUrlDirectory = ConfigurationManager.AppSettings["PackageUrlDirectory"];
             AddTemplates(_package.IncludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("includedFiles"));
             AddTemplates(_package.ExcludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("excludedFiles"));
         }
@@ -82,7 +85,22 @@ namespace BitsUpdatePacker
                     ExcludedFiles = ConvertFileTemplates(_package.ExcludedFiles),
                 };
                 _package.TokenString = package.Create(_package.OutputDirectory);
+                CreateManifest();
                 MessageBox.Show("Update package was successfully completed.", "Package Completed!", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            }
+        }
+
+        private void CreateManifest()
+        {
+            XmlUpdateManifest manifest = new XmlUpdateManifest
+            {
+                Url = ((_package.PackageUrlDirectory.EndsWith("/")) ? _package.PackageUrlDirectory : _package.PackageUrlDirectory + "/") + string.Format(UpdatePackage.AssemblyName, _package.NextVersion) + UpdatePackage.AssemblySuffix + UpdatePackage.PackageSuffix,
+                Version = _package.NextVersion.ToString(),
+            };
+
+            using (var manifestFile = new FileStream(System.IO.Path.Combine(_package.OutputDirectory, "UpdateManifest.xml"), FileMode.Create))
+            {
+                _manifestSerializer.Serialize(manifestFile, manifest);
             }
         }
 
@@ -114,7 +132,9 @@ namespace BitsUpdatePacker
             BindingExpression outputPath = sfcOutput.GetBindingExpression(SelectFolderControl.FolderPathProperty);
             outputPath.UpdateSource();
 
-            return !version.HasError && !certificatePath.HasError && !outputPath.HasError;
+            BindingExpression url = txtUrl.GetBindingExpression(TextBox.TextProperty);
+            url.UpdateSource();
+            return !version.HasError && !certificatePath.HasError && !outputPath.HasError && !url.HasError;
         }
 
     }

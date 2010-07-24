@@ -5,11 +5,11 @@ using System.Text;
 
 namespace BitsUpdater.Behavior
 {
-    public class UpdateProcessWithDatabaseBehavior : UpdateProcessBehavior
+    public class UpdateDatabaseBehavior : IUpdateBehavior
     {
-        public override void Execute()
+        public void Execute()
         {
-            base.Execute();
+            throw new NotImplementedException();
         }
     }
 }

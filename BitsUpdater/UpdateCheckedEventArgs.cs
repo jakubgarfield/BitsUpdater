@@ -5,8 +5,14 @@ using System.Text;
 
 namespace BitsUpdater
 {
+    /// <summary>
+    /// Event args used by CheckUpdate method in BitsUpdater.
+    /// </summary>
     public sealed class UpdateCheckedEventArgs : EventArgs
     {
+        /// <summary>
+        /// True if new updates are available, false in there are no new updates.
+        /// </summary>
         public bool UpdatesAvailable
         {
             get;

@@ -5,8 +5,14 @@ using System.Text;
 
 namespace BitsUpdater.Behavior
 {
+    /// <summary>
+    /// NOT IMPLEMENTED YET!
+    /// </summary>
     public class UpdateDatabaseBehavior : IUpdateBehavior
     {
+        /// <summary>
+        /// Not implemented yet.
+        /// </summary>
         public void Execute()
         {
             throw new NotImplementedException();

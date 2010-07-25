@@ -19,7 +19,7 @@ namespace BitsUpdater.Example
             Console.WriteLine("Press key to continue...");
             Console.ReadKey();
 
-            BitsUpdater updater = new BitsUpdater("http://chodounsky.net/files/temp/UpdateManifest.xml", Path.GetDirectoryName(assemblyDirectory));
+            BitsUpdater updater = new BitsUpdater("http://chodounsky.net/projects/BitsUpdater.Example/UpdateManifest.xml", Path.GetDirectoryName(assemblyDirectory));
             RegisterUpdaterEvents(updater);
             updater.ResumePreviousDownload();
 

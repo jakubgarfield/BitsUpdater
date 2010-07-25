@@ -7,12 +7,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BitsUpdater.Packer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("BitsUpdatePacker")]
+[assembly: AssemblyDescription("BitsUpdatePacker is program used to create update packages for BitsUpdater")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("BitsUpdater.Packer")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
+[assembly: AssemblyCompany("Jakub Chodounsky")]
+[assembly: AssemblyProduct("BitsUpdatePacker")]
+[assembly: AssemblyCopyright("Copyright © Jakub Chodounsky 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

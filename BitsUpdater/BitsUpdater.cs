@@ -12,6 +12,9 @@ using System.IO;
 
 namespace BitsUpdater
 {
+    /// <summary>
+    /// Main class used for update download, checking for new updates and their applying.
+    /// </summary>
     public sealed class BitsUpdater : IDisposable
     {
         private static readonly XmlSerializer _manifestSerializer = new XmlSerializer(typeof(XmlUpdateManifest));
@@ -27,15 +30,33 @@ namespace BitsUpdater
 
         private XmlUpdateManifest _manifest;
 
+        /// <summary>
+        /// Notifies when update check is done. It is raised by CheckUpdatesAsync method.
+        /// </summary>
         public event EventHandler<UpdateCheckedEventArgs> UpdateChecked;
+        /// <summary>
+        /// Event is fired when new updates are downloaded.
+        /// </summary>
         public event EventHandler<UpdateDownloadedEventArgs> UpdateDownloaded;
+        /// <summary>
+        /// Event is fired when error occurs during download.
+        /// </summary>
         public event EventHandler<UpdateErrorEventArgs> UpdateDownloadError;
+        /// <summary>
+        /// Event is raised if the progress of Bits download changed. Can be used to display current update progress.
+        /// </summary>
         public event EventHandler<UpdateProgressEventArgs> UpdateDownloadProgressChanged;
 
+        /// <summary>
+        /// Initializes new instance of BitsUpdater.
+        /// </summary>
+        /// <param name="manifestUrl">Location of UpdateManifest.xml on the internet.</param>
+        /// <param name="updateDirectory">Location of update store directory. For example if directory Version is passed, actual download of version 1.0.0.1 will be located in Version\1.0.0.1 directory.</param>
         public BitsUpdater(string manifestUrl, string updateDirectory)
         {
             _manifestUrl = manifestUrl;
             _updateDirectory = updateDirectory.EndsWith("\\") ? updateDirectory + "{0}" : updateDirectory + "\\{0}";
+            ResumePreviousDownload();
         }
 
         /// <summary>
@@ -81,6 +102,42 @@ namespace BitsUpdater
             return false;
         }
 
+        /// <summary>
+        /// Apply downloaded updates. This method will unpack update to specified directory.
+        /// </summary>
+        /// <param name="publicToken">Public token is used to unpack files in UpdatePackage. Public token can be obtained while using BitsUpdatePacker app and creating package.</param>
+        /// <returns>True if everything went well.</returns>
+        public bool Update(string publicToken)
+        {
+            return Update(null, publicToken);
+        }
+
+        /// <summary>
+        /// Apply downloaded updates. Method will execute behavior method after files are unpacked.
+        /// </summary>
+        /// <param name="behavior">Defines behavior of update method after files are unpacked. For example you can backup your database etc.</param>
+        /// <param name="publicToken">Public token is used to unpack files in UpdatePackage. Public token can be obtained while using BitsUpdatePacker app and creating package.</param>
+        /// <returns>True if everything went well.</returns>
+        public bool Update(IUpdateBehavior behavior, string publicToken)
+        {
+            if (_status.NextVersion > Assembly.GetEntryAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
+            {
+                UpdatePackage.Extract(string.Format(_updateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
+
+                if (behavior != null)
+                {
+                    behavior.Execute();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Resumes active BITS download if there is any. This method should be called with initializing new BitsUpdater.
+        /// </summary>
         public void ResumePreviousDownload()
         {
             if (_status.BitsJobId != Guid.Empty)
@@ -101,28 +158,6 @@ namespace BitsUpdater
                     }
                 }
             }
-        }
-
-        public bool Update(string publicToken)
-        {
-            return Update(null, publicToken);
-        }
-
-        public bool Update(IUpdateBehavior behavior, string publicToken)
-        {
-            if (_status.NextVersion > Assembly.GetEntryAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
-            {
-                UpdatePackage.Extract(string.Format(_updateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
-
-                if (behavior != null)
-                {
-                    behavior.Execute();
-                }
-
-                return true;
-            }
-
-            return false;
         }
 
         public void Dispose()

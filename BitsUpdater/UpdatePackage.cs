@@ -90,7 +90,7 @@ namespace BitsUpdater
             }
         }
 
-        public static void Extract(string outputDirectory, Version version, string publicToken)
+        internal static void Extract(string outputDirectory, Version version, string publicToken)
         {
             string packageLocation = Path.Combine(Path.GetDirectoryName(outputDirectory), string.Format(AssemblyName, version) + AssemblySuffix + PackageSuffix);
             string assemblyLocation = Path.Combine(Assembly.GetEntryAssembly().GetDirectory(), string.Format(AssemblyName, version) + AssemblySuffix);

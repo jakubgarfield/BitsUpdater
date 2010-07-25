@@ -17,12 +17,13 @@ namespace BitsUpdater
         private static readonly XmlSerializer _manifestSerializer = new XmlSerializer(typeof(XmlUpdateManifest));
 
         private const String JobDescription = "BitsUpdater application update download";
-        private const String UpdateDirectory = "Versions\\{0}";
 
         private readonly UpdateStatus _status = UpdateStatus.Load();
         private readonly BitsManager _manager = new BitsManager();
         private readonly WebClient _webClient = new WebClient();
         private readonly String _manifestUrl;
+        private readonly String _updateDirectory;
+
 
         private XmlUpdateManifest _manifest;
 
@@ -31,9 +32,10 @@ namespace BitsUpdater
         public event EventHandler<UpdateErrorEventArgs> UpdateDownloadError;
         public event EventHandler<UpdateProgressEventArgs> UpdateDownloadProgressChanged;
 
-        public BitsUpdater(string manifestUrl)
+        public BitsUpdater(string manifestUrl, string updateDirectory)
         {
             _manifestUrl = manifestUrl;
+            _updateDirectory = updateDirectory.EndsWith("\\") ? updateDirectory + "{0}" : updateDirectory + "\\{0}";
         }
 
         /// <summary>
@@ -108,9 +110,9 @@ namespace BitsUpdater
 
         public bool Update(IUpdateBehavior behavior, string publicToken)
         {
-            if (_status.NextVersion > Assembly.GetExecutingAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
+            if (_status.NextVersion > Assembly.GetEntryAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
             {
-                UpdatePackage.Extract(string.Format(UpdateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
+                UpdatePackage.Extract(string.Format(_updateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
 
                 if (behavior != null)
                 {
@@ -126,6 +128,11 @@ namespace BitsUpdater
         public void Dispose()
         {
             _manager.Dispose();
+        }
+
+        private String GetUpdateSaveLocation()
+        {
+            return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().GetDirectory()), String.Format("{0}{1}{2}", string.Format(UpdatePackage.AssemblyName, _status.NextVersion), UpdatePackage.AssemblySuffix, UpdatePackage.PackageSuffix));
         }
 
         private void StartDownload()
@@ -182,16 +189,11 @@ namespace BitsUpdater
                 };
         }
 
-        private String GetUpdateSaveLocation()
-        {
-            return Path.Combine(Assembly.GetExecutingAssembly().GetDirectory(), String.Format("{0}{1}{2}", string.Format(UpdatePackage.AssemblyName, _status.NextVersion), UpdatePackage.AssemblySuffix, UpdatePackage.PackageSuffix));
-        }
-
         private bool UpdatesAvailable()
         {
             if (_manifest != null)
             {
-                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
                 var manifestVersion = new Version(_manifest.Version);
                 return (manifestVersion > currentVersion && _status.NextVersion < manifestVersion);
             }

@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using System.IO;
+using System.Reflection;
+using BitsUpdater.Extensions;
 
 namespace BitsUpdater
 {
     internal sealed class UpdateStatus
     {
+        internal const String UpdateStatusFileName = "UpdateStatus.xml";
         private static readonly XmlSerializer _xmlUpdateStatusSerializer = new XmlSerializer(typeof(XmlUpdateStatus));
         private XmlUpdateStatus _updateStatus = new XmlUpdateStatus();
-        private const string UpdateStatusFileName = "UpdateStatus.xml";
         private Guid _jobId;
         private Version _nextVersion;
 
@@ -51,7 +53,7 @@ namespace BitsUpdater
 
             try
             {
-                using (var xmlFile = new FileStream(UpdateStatus.UpdateStatusFileName, FileMode.Open, FileAccess.Read))
+                using (var xmlFile = new FileStream(Path.Combine(Assembly.GetEntryAssembly().GetDirectory(), UpdateStatusFileName), FileMode.Open, FileAccess.Read))
                 {
                     updateStatus._updateStatus = (XmlUpdateStatus)_xmlUpdateStatusSerializer.Deserialize(xmlFile);
                 }
@@ -76,7 +78,7 @@ namespace BitsUpdater
 
         public void Save()
         {
-            using (var file = new FileStream(UpdateStatusFileName, FileMode.OpenOrCreate))
+            using (var file = new FileStream(Path.Combine(Assembly.GetEntryAssembly().GetDirectory(), UpdateStatusFileName), FileMode.OpenOrCreate))
             {
                 _xmlUpdateStatusSerializer.Serialize(file, _updateStatus);
             }

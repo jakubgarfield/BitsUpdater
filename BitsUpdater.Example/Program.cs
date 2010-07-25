@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BitsUpdater.Behavior;
+using System.IO;
+using System.Reflection;
+using BitsUpdater.Extensions;
 
 namespace BitsUpdater.Example
 {
@@ -12,13 +14,18 @@ namespace BitsUpdater.Example
 
         static void Main(string[] args)
         {
-            BitsUpdater updater = new BitsUpdater("http://chodounsky.net/files/temp/UpdateManifest.xml");
+            var assemblyDirectory = Assembly.GetExecutingAssembly().GetDirectory();
+            Console.WriteLine("Starting BitsUpdater.Example version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString()  +" from location " + assemblyDirectory);
+            Console.WriteLine("Press key to continue...");
+            Console.ReadKey();
+
+            BitsUpdater updater = new BitsUpdater("http://chodounsky.net/files/temp/UpdateManifest.xml", Path.GetDirectoryName(assemblyDirectory));
             RegisterUpdaterEvents(updater);
             updater.ResumePreviousDownload();
 
             updater.CheckUpdateAsync();
 
-            Console.ReadLine();
+            Console.ReadKey();
         }
 
         private static void RegisterUpdaterEvents(BitsUpdater updater)

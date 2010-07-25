@@ -92,9 +92,11 @@ namespace BitsUpdater
 
         public static void Extract(string outputDirectory, Version version, string publicToken)
         {
+            string packageLocation = Path.Combine(Path.GetDirectoryName(outputDirectory), string.Format(AssemblyName, version) + AssemblySuffix + PackageSuffix);
+            string assemblyLocation = Path.Combine(Assembly.GetEntryAssembly().GetDirectory(), string.Format(AssemblyName, version) + AssemblySuffix);
             CopyPreviousFiles(outputDirectory);
-            Decompress(string.Format(AssemblyName, version) + AssemblySuffix);
-            ExtractFiles(version, outputDirectory, publicToken);
+            Decompress(packageLocation, assemblyLocation);
+            ExtractFiles(version, outputDirectory, publicToken, assemblyLocation);
         }
 
         private static void CopyPreviousFiles(string outputDirectory)
@@ -119,7 +121,6 @@ namespace BitsUpdater
                 catch (ArgumentException) { /* Version try parse */ }
                 catch (OverflowException) { /* Version try parse */ }
                 catch (FormatException) { /* Version try parse */ }
-
             }
 
             Directory.CreateDirectory(outputDirectory);
@@ -128,18 +129,21 @@ namespace BitsUpdater
             {
                 foreach (var item in Directory.GetFiles(Path.Combine(versionDirectory, max.ToString())))
                 {
-                    using (FileStream input = new FileStream(item, FileMode.Open, FileAccess.Read))
+                    if (!item.EndsWith(UpdateStatus.UpdateStatusFileName, true, CultureInfo.InvariantCulture))
                     {
-                        using (FileStream output = new FileStream(Path.Combine(outputDirectory, Path.GetFileName(item)), FileMode.OpenOrCreate))
+                        using (FileStream input = new FileStream(item, FileMode.Open, FileAccess.Read))
                         {
-                            input.CopyTo(output);
+                            using (FileStream output = new FileStream(Path.Combine(outputDirectory, Path.GetFileName(item)), FileMode.OpenOrCreate))
+                            {
+                                input.CopyTo(output);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static void ExtractFiles(Version version, string outputDirectory, string publicToken)
+        private static void ExtractFiles(Version version, string outputDirectory, string publicToken, string assemblyLocation)
         {
             var domain = AppDomain.CreateDomain("TemporaryDomain");
             var proxy = domain.CreateInstanceAndUnwrap(Assembly.GetAssembly(typeof(AssemblyProxy)).FullName, typeof(AssemblyProxy).ToString()) as AssemblyProxy;
@@ -148,7 +152,7 @@ namespace BitsUpdater
                 proxy.ExtractUpdate(version, outputDirectory, publicToken);
             }
             AppDomain.Unload(domain);
-            File.Delete(string.Format(AssemblyName, version) + AssemblySuffix);
+            File.Delete(assemblyLocation);
         }
 
         private string RetrievePublicTokenString(AssemblyName name)
@@ -290,11 +294,11 @@ namespace BitsUpdater
             File.Delete(Path.Combine(directory, fileName));
         }
 
-        private static void Decompress(string fileName)
+        private static void Decompress(string packageName, string assemblyLocation)
         {
-            using (var inFile = new FileStream(fileName + PackageSuffix, FileMode.Open))
+            using (var inFile = new FileStream(packageName, FileMode.Open))
             {
-                using (var outFile = new FileStream(fileName, FileMode.Create))
+                using (var outFile = new FileStream(assemblyLocation, FileMode.Create))
                 {
                     using (var decompress = new GZipStream(inFile, CompressionMode.Decompress))
                     {
@@ -302,7 +306,7 @@ namespace BitsUpdater
                     }
                 }
             }
-            File.Delete(fileName + PackageSuffix);
+            File.Delete(packageName);
         }
     }
 }

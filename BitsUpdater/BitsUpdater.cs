@@ -72,7 +72,7 @@ namespace BitsUpdater
         }
 
         /// <summary>
-        /// Checks for new updates asynchronnously. After update check is finished, event UpdateChecked is raised.
+        /// Checks for new updates asynchronously. After update check is finished, event UpdateChecked is raised.
         /// </summary>
         /// <exception cref="ArgumentNullException">Thrown when manifestUrl is null.</exception>
         /// <exception cref="WebException">Thrown when manifestUrl is not valid url or client can't connect to specified url.</exception>

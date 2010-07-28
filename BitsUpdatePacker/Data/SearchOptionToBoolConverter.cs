@@ -8,7 +8,7 @@ using System.IO;
 namespace BitsUpdatePacker.Data
 {
     [ValueConversion(typeof(object), typeof(Version))]
-    public sealed class BoolToSearchOptionConverter : IValueConverter
+    public sealed class SearchOptionToBoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

@@ -16,7 +16,7 @@ namespace BitsUpdatePacker.Configuration
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((TemplatesElement)(element)).Id;
+            return (((TemplatesElement)(element)).Directory + ((TemplatesElement)(element)).Pattern).GetHashCode();
         }
 
         public TemplatesElement this[int idx]

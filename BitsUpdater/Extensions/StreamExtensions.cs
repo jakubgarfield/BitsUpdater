@@ -43,9 +43,14 @@ namespace BitsUpdater.Extensions
                 other.Read(two, 0, buffer);
 
                 if (BitConverter.ToInt64(one, 0) != BitConverter.ToInt64(two, 0))
+                {
+                    input.Position = 0;
+                    other.Position = 0;
                     return false;
+                }
             }
-
+            input.Position = 0;
+            other.Position = 0;
             return true;
         }
     }

@@ -9,19 +9,6 @@ namespace BitsUpdatePacker.Configuration
 {
     internal sealed class TemplatesElement : ConfigurationElement
     {
-        [ConfigurationProperty("id", DefaultValue = "", IsKey = true, IsRequired = true)]
-        public string Id
-        {
-            get
-            {
-                return ((string)(base["id"]));
-            }
-            set
-            {
-                base["id"] = value;
-            }
-        }
-
         [ConfigurationProperty("directory", DefaultValue = "", IsKey = false, IsRequired = true)]
         public string Directory
         {

@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.IO;
+using BitsUpdatePacker.Configuration;
+using System.Configuration;
+using BitsUpdater;
 
 namespace BitsUpdatePacker
 {
@@ -62,6 +66,46 @@ namespace BitsUpdatePacker
         {
             IncludedFiles = new ObservableCollection<UIFileSearchTemplate>();
             ExcludedFiles = new ObservableCollection<UIFileSearchTemplate>();
+            InitializeConfigValues();
+        }
+
+        public static IEnumerable<FileSearchTemplate> ConvertFileTemplates(IEnumerable<UIFileSearchTemplate> files)
+        {
+            var result = new List<FileSearchTemplate>();
+
+            if (files != null)
+            {
+                foreach (var item in files)
+                {
+                    if (Directory.Exists(item.Directory))
+                    {
+                        result.Add(new FileSearchTemplate(new DirectoryInfo(item.Directory), item.Pattern, item.SearchOption));
+                    }
+                }
+            }
+            return result;
+        }
+
+        private void InitializeConfigValues()
+        {
+            OutputDirectory = ConfigurationManager.AppSettings["OutputDirectory"];
+            CertificatePath = ConfigurationManager.AppSettings["CertificatePath"];
+            PackageUrlDirectory = ConfigurationManager.AppSettings["PackageDirectoryUrl"];
+            AddTemplates(IncludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("includedFiles"));
+            AddTemplates(ExcludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("excludedFiles"));
+        }
+
+        private void AddTemplates(ObservableCollection<UIFileSearchTemplate> observableCollection, TemplatesConfigSection configSection)
+        {
+            foreach (TemplatesElement item in configSection.Templates)
+            {
+                observableCollection.Add(new UIFileSearchTemplate
+                {
+                    Directory = item.Directory,
+                    Pattern = item.Pattern,
+                    SearchOption = item.SearchOption,
+                });
+            }
         }
     }
 }

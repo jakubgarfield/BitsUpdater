@@ -89,17 +89,14 @@ namespace BitsUpdater
         /// <summary>
         /// Starts downloading updates using BITS. If new updates are downloaded event UpdateDownloaded is raised. If hadn't checked for updates, it uses synchronous method CheckUpdates.
         /// </summary>
-        /// <returns>Returns true if new updates are available and starts downloading.</returns>
-        public bool Download()
+        public void Download()
         {
             if ((_manifest == null) ? CheckUpdate() : UpdatesAvailable())
             {
                 _status.NextVersion = new Version(_manifest.Version);
                 _status.Save();
                 StartDownload();
-                return true;
             }
-            return false;
         }
 
         /// <summary>
@@ -122,7 +119,7 @@ namespace BitsUpdater
         {
             if (_status.NextVersion > Assembly.GetEntryAssembly().GetName().Version && File.Exists(GetUpdateSaveLocation()))
             {
-                UpdatePackage.Extract(string.Format(_updateDirectory, _status.NextVersion), _status.NextVersion, publicToken);
+                UpdatePackage.Extract(new DirectoryInfo(string.Format(_updateDirectory, _status.NextVersion)), _status.NextVersion, publicToken);
 
                 if (behavior != null)
                 {

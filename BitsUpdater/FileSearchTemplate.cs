@@ -9,7 +9,7 @@ namespace BitsUpdater
     /// <summary>
     /// FileSearchTemplate is a mask used by BitsUpdatePacker to search files that are included in UpdatePackage.
     /// </summary>
-    public sealed class FileSearchTemplate
+    public struct FileSearchTemplate
     {
         /// <summary>
         /// Search pattern used in Directory.GetFiles() method.
@@ -23,7 +23,7 @@ namespace BitsUpdater
         /// <summary>
         /// Root directory used for search.
         /// </summary>
-        public string Directory
+        public DirectoryInfo Directory
         {
             get;
             set;
@@ -38,7 +38,8 @@ namespace BitsUpdater
             set;
         }
 
-        public FileSearchTemplate(string directory, string pattern, SearchOption option)
+        public FileSearchTemplate(DirectoryInfo directory, string pattern, SearchOption option)
+            : this()
         {
             Pattern = pattern;
             Directory = directory;

@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyProxy.cs" />
     <Compile Include="Behavior\IUpdateBehavior.cs" />
     <Compile Include="Behavior\UpdateDatabaseBehavior.cs" />
     <Compile Include="Behavior\UpdateServiceBehavior.cs" />
@@ -64,10 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Files\Documentation\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Files\Releases\BitsUpdatePacker v1.0.zip" />
-    <None Include="Files\Releases\BitsUpdater v0.1.zip" />
+    <Folder Include="Files\Releases\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

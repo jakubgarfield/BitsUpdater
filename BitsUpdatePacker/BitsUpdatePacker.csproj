@@ -97,7 +97,7 @@
     <Compile Include="Configuration\TemplatesCollection.cs" />
     <Compile Include="Configuration\TemplatesElement.cs" />
     <Compile Include="Configuration\TemplatesConfigSection.cs" />
-    <Compile Include="Data\BoolToSearchOptionConverter.cs" />
+    <Compile Include="Data\SearchOptionToBoolConverter.cs" />
     <Compile Include="Data\CertificateValidationRule.cs" />
     <Compile Include="Data\DirectoryCreateValidationRule.cs" />
     <Compile Include="Data\DirectoryExistsValidationRule.cs" />

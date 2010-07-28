@@ -19,7 +19,7 @@
         <Grid.Resources>
 
             <data:VersionConverter x:Key="VersionConverter" />
-            <data:BoolToSearchOptionConverter x:Key="BoolToSearchOptionConverter" />
+            <data:SearchOptionToBoolConverter x:Key="BoolToSearchOptionConverter" />
 
             <DataTemplate x:Key="FileSearchTemplate">
                 <Grid Margin="5 0 5 10">

@@ -28,30 +28,7 @@ namespace BitsUpdatePacker
         public MainWindow()
         {
             InitializeComponent();
-            InitializeConfigValues();
-            this.DataContext = _package;            
-        }
-
-        private void InitializeConfigValues()
-        {
-            _package.OutputDirectory = ConfigurationManager.AppSettings["OutputDirectory"];
-            _package.CertificatePath = ConfigurationManager.AppSettings["CertificatePath"];
-            _package.PackageUrlDirectory = ConfigurationManager.AppSettings["PackageUrlDirectory"];
-            AddTemplates(_package.IncludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("includedFiles"));
-            AddTemplates(_package.ExcludedFiles, (TemplatesConfigSection)ConfigurationManager.GetSection("excludedFiles"));
-        }
-
-        private void AddTemplates(ObservableCollection<UIFileSearchTemplate> observableCollection, TemplatesConfigSection configSection)
-        {
-            foreach (TemplatesElement item in configSection.Templates)
-            {
-                observableCollection.Add(new UIFileSearchTemplate
-                {
-                    Directory = item.Directory,
-                    Pattern = item.Pattern,
-                    SearchOption = item.SearchOption,
-                });
-            }
+            this.DataContext = _package;
         }
 
         private void RemoveTemplateExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -67,7 +44,7 @@ namespace BitsUpdatePacker
         {
             if (e.Parameter.ToString() == "Include")
             {
-                _package.IncludedFiles.Add(new UIFileSearchTemplate());                
+                _package.IncludedFiles.Add(new UIFileSearchTemplate());
             }
             else if (e.Parameter.ToString() == "Exclude")
             {
@@ -79,14 +56,22 @@ namespace BitsUpdatePacker
         {
             if (IsValid((Grid)sender))
             {
-                var package = new UpdatePackage(_package.CertificatePath, _package.NextVersion, _package.IsDifferential)
+                var package = new UpdatePackage(_package.CertificatePath, _package.NextVersion, _package.IsDifferential);
+                foreach (var item in UIUpdatePackage.ConvertFileTemplates(_package.IncludedFiles))
                 {
-                    IncludedFiles = ConvertFileTemplates(_package.IncludedFiles),
-                    ExcludedFiles = ConvertFileTemplates(_package.ExcludedFiles),
-                };
-                _package.TokenString = package.Create(_package.OutputDirectory);
+                    package.IncludedFiles.Add(item);
+                }
+                foreach (var item in UIUpdatePackage.ConvertFileTemplates(_package.ExcludedFiles))
+                {
+                    package.ExcludedFiles.Add(item);
+                }
+                _package.TokenString = package.Create(new DirectoryInfo(_package.OutputDirectory));
                 CreateManifest();
-                MessageBox.Show("Update package was successfully completed.", "Package Completed!", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                MessageBox.Show(this
+                              , "Update package was successfully completed."
+                              , "Package Completed!"
+                              , MessageBoxButton.OK
+                              , MessageBoxImage.Asterisk);
             }
         }
 
@@ -102,23 +87,6 @@ namespace BitsUpdatePacker
             {
                 _manifestSerializer.Serialize(manifestFile, manifest);
             }
-        }
-
-        private IEnumerable<FileSearchTemplate> ConvertFileTemplates(IEnumerable<UIFileSearchTemplate> files)
-        {
-            var result = new List<FileSearchTemplate>();
-
-            if (files != null)
-            {
-                foreach (var item in files)
-                {
-                    if (Directory.Exists(item.Directory))
-                    {
-                        result.Add(new FileSearchTemplate(item.Directory, item.Pattern, item.SearchOption));
-                    }
-                }
-            }
-            return result;
         }
 
         private bool IsValid(Grid grid)

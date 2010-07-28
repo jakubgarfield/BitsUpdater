@@ -10,7 +10,7 @@ namespace BitsUpdater.Example
 {
     class Program
     {
-        public const String PublicToken = "ad4a61e338c93fde";
+        public const String PublicToken = "e9aa88526a6ef0e2";
 
         static void Main(string[] args)
         {

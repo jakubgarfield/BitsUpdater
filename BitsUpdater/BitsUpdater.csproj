@@ -63,7 +63,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Files\Documentation\" />
-    <Folder Include="Files\Releases\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Files\Releases\ApplicationLauncher.zip" />
+    <None Include="Files\Releases\BitsUpdatePacker 1.0.zip" />
+    <None Include="Files\Releases\BitsUpdater 1.0.zip" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

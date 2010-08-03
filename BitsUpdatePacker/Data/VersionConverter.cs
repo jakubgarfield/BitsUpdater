@@ -16,7 +16,7 @@ namespace BitsUpdatePacker.Data
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return Version.Parse((value ?? String.Empty).ToString());
+            return new Version((string)value);
         }
     }
 }

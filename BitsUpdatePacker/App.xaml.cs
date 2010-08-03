@@ -14,10 +14,19 @@ namespace BitsUpdatePacker
     {
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            var result = MessageBox.Show(this.MainWindow
-                                       , e.Exception.GetType().FullName + "\r\n\r\n" + e.Exception.Message + "\r\n\r\nDo you want to continue?", "Oooops, something went wrong..."
-                                       , MessageBoxButton.OK
-                                       , MessageBoxImage.Error);
+            if (this.MainWindow != null)
+            {
+                var result = MessageBox.Show(this.MainWindow
+                                           , e.Exception.GetType().FullName + "\r\n\r\n" + e.Exception.Message + "\r\n\r\nDo you want to continue?", "Oooops, something went wrong..."
+                                           , MessageBoxButton.OK
+                                           , MessageBoxImage.Error);
+            }
+            else
+            {
+                var result = MessageBox.Show(e.Exception.GetType().FullName + "\r\n\r\n" + e.Exception.Message + "\r\n\r\nDo you want to continue?", "Oooops, something went wrong..."
+                                           , MessageBoxButton.OK
+                                           , MessageBoxImage.Error);
+            }
             e.Handled = true;
             App.Current.Shutdown(1);
         }
